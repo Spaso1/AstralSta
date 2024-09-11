@@ -1,21 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              tools:context=".MainActivity">
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
+    <!-- 侧边菜单 -->
+    <androidx.drawerlayout.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" tools:ignore="ExtraText">
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+
+
+
+        <!-- 侧边菜单 -->
+        <ListView
+                android:id="@+id/navigation_drawer"
+                android:layout_width="240dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start"
+                android:choiceMode="singleChoice"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0dp"
+                android:padding="16dp"
+                android:background="#ADD8E6"/>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+    <!-- 固定在底部的按钮 -->
     <Button
-            android:id="@+id/button_select_file"
+            android:id="@+id/btn_pick_file"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select CSV File" />
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_margin="16dp"
+            android:text="Pick File"/>
 
-    <TextView
-            android:id="@+id/textView_result"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Result will be displayed here" />
-</LinearLayout>
-   
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
