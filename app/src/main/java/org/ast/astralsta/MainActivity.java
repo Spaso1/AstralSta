@@ -1,10 +1,17 @@
 package org.ast.astralsta;
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.icu.util.Calendar;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import android.app.Activity;
@@ -21,9 +28,9 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,14 +39,15 @@ public class MainActivity extends AppCompatActivity {
     private ListView navigationDrawer;
 
     private RecyclerView recyclerView;
+    private DatabaseHelper databaseHelper;
     private MyAdapter adapter;
-    private List<String> items;
+    private List<String> items = new ArrayList<>();
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        databaseHelper = new DatabaseHelper(this);
         // 初始化侧边菜单
         initNavigationDrawer();
 
@@ -47,11 +55,43 @@ public class MainActivity extends AppCompatActivity {
         btnPickFile.setOnClickListener(v -> pickFile());
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // 初始化 Toolbar
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        items = Arrays.asList("Item 1", "Item 2", "Item 3", "Item 4", "Item 5");
+        // 设置返回箭头
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        Button buttonSelectMonthYear = findViewById(R.id.button_select_month_year);
+
+        buttonSelectMonthYear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMonthPicker();
+            }
+        });
         adapter = new MyAdapter(items);
         recyclerView.setAdapter(adapter);
+        writeData();
+
     }
+    private void showMonthPicker() {
+        final Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        // 创建DatePickerDialog实例
+        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
+                // 因为我们只关心月份，这里可以忽略year和day
+                String selectedMonthStr = String.format("%02d", (selectedMonth + 1));
+                Toast.makeText(getApplicationContext(), "您选择了月份：" + selectedMonthStr, Toast.LENGTH_SHORT).show();
+            }
+        }, year, month, day).show();
+    }
+
 
     private void initNavigationDrawer() {
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -107,16 +147,37 @@ public class MainActivity extends AppCompatActivity {
             String fileContent = content.toString();
             fileContent = fileContent.split("交易单号,商户单号,备注")[1];
             String data[] = fileContent.split("\n");
+            int i = 0;
+            int i2 = 0;
             for (String line2 : data) {
-                Log.d("File Content", line2);//line2就是初步数据
+                Log.d("File Content", line2);
+                try {
+                    double a = Double.parseDouble(line2.split(",")[5].replace("¥",""));
+                    if(line2.split(",")[4].equals("支出")) {
+                        a = a * -1;
+                    }
+                    Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[3],  a, line2.split(",")[8], line2.split(",")[6]);
+                    Log.d("Item", item.toGeShiHua());
+                    if(databaseHelper.queryByCODE(item.getCode()).getCount() == 0) {
+                        i2 ++;
+                        databaseHelper.addItem(item);
+                        items.add(item.toGeShiHua());
+                        adapter.notifyItemInserted(items.size() - 1);
+                    }else {
+                        i ++;
+                        Toast.makeText(this, "数据已存在", Toast.LENGTH_SHORT);
+                    }
+                }catch (Exception e) {
+
+                }
             }
+            Toast.makeText(this, "已导入" + i2 + "条数据，跳过" + i + "条数据", Toast.LENGTH_SHORT).show();
 
         } catch (IOException e) {
             e.printStackTrace();
 
         }
     }
-
     private String readFile() {
         StringBuilder content = new StringBuilder();
         try {
@@ -168,16 +229,19 @@ public class MainActivity extends AppCompatActivity {
                 String time = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TIME));
                 String to = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TO));
                 String good = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOOD));
-                int inOut = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_IN_OUT));
+                double inOut = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_IN_OUT));
                 String code = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_CODE));
                 String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
                 Item item = new Item(id, time, to, good, inOut, code, enumValue);
                 items.add(item.toGeShiHua());
+                adapter.notifyItemInserted(items.size() - 1);
+
                 // 处理每一行数据
                 Log.d("Database", "ID: " + id + ", Time: " + time + ", To: " + to + ", Good: " + good + ", InOut: " + inOut + ", Code: " + code + ", Enum: " + enumValue);
             } while (cursor.moveToNext());
         }
-
+        TextView textView = findViewById(R.id.textView6);
+        textView.setText(String.valueOf(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)));
         cursor.close();
         db.close();
     }

@@ -1,6 +1,8 @@
 package org.ast.astralsta;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -51,7 +53,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
-    public long addItem(String time, String to, String good, int in_out, String code, String enumValue) {
+    public long addItem(String time, String to, String good, double in_out, String code, String enumValue) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_TIME, time);
@@ -65,4 +67,60 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return newRowId;
     }
+    public long addItem(Item item) {
+        String time = item.getTime();
+        String to = item.getTo();
+        String good = item.getGood();
+        double in_out = item.getIn_out();
+        String code = item.getCode();
+        String enumValue = item.getEnumValue();
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TIME, time);
+        values.put(COLUMN_TO, to);
+        values.put(COLUMN_GOOD, good);
+        values.put(COLUMN_IN_OUT, in_out);
+        values.put(COLUMN_CODE, code);
+        values.put(COLUMN_ENUM, enumValue);
+
+        long newRowId = db.insert(TABLE_NAME, null, values);
+        db.close();
+        return newRowId;
+    }
+    public Cursor queryByCODE(String cODE) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {COLUMN_ID, COLUMN_TIME, COLUMN_TO, COLUMN_GOOD, COLUMN_IN_OUT, COLUMN_CODE, COLUMN_ENUM};
+        String selection = COLUMN_CODE + " = ?";
+        String[] selectionArgs = {cODE};
+        return db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+    }
+    public void clearAllData() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
+        db.close();
+    }
+
+    public void deleteDataById(long id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String whereClause = COLUMN_ID + " = ?";
+        String[] whereArgs = {String.valueOf(id)};
+        db.delete(TABLE_NAME, whereClause, whereArgs);
+        db.close();
+    }
+    @SuppressLint("Range")
+    public long sumColumn(String columnName) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT SUM(" + columnName + ") AS total FROM " + TABLE_NAME;
+        Cursor cursor = db.rawQuery(query, null);
+
+        long sum = 0;
+        if (cursor.moveToFirst()) {
+            sum = cursor.getLong(cursor.getColumnIndex("total"));
+        }
+
+        cursor.close();
+        db.close();
+        return sum;
+    }
+
 }

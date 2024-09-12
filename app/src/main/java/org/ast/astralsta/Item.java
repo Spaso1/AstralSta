@@ -5,11 +5,11 @@ public class Item {
     private String time;
     private String to;
     private String good;
-    private int in_out;
+    private double in_out;
     private String code;
     private String enumValue;
 
-    public Item(int id, String time, String to, String good, int in_out, String code, String enumValue) {
+    public Item(int id, String time, String to, String good, double in_out, String code, String enumValue) {
         this.id = id;
         this.time = time;
         this.to = to;
@@ -35,7 +35,7 @@ public class Item {
         return good;
     }
 
-    public int getIn_out() {
+    public double getIn_out() {
         return in_out;
     }
 
@@ -51,6 +51,6 @@ public class Item {
         if (in_out > 0) {
             return "收入" + good +"+" + in_out;
         }
-        return "商品" + good + "价格:" + in_out;
+        return "商品" + good + "\n 价格:" + in_out;
     }
 }
