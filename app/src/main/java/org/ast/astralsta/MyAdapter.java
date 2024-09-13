@@ -1,5 +1,6 @@
 package org.ast.astralsta;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import static org.ast.astralsta.MainActivity.*;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
@@ -35,12 +38,33 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         return data == null ? 0 : data.size();
     }
 
-    static class MyViewHolder extends RecyclerView.ViewHolder {
+    static class MyViewHolder extends RecyclerView.ViewHolder  implements View.OnClickListener {
         TextView textView;
 
-        MyViewHolder(View view) {
-            super(view);
-            textView = view.findViewById(R.id.textView);
+        public MyViewHolder(@NonNull View itemView) {
+            super(itemView);
+            textView = itemView.findViewById(R.id.textView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        // 获取点击项的数据
+                        String itemData = items.get(position);
+                        int itemId = itemsSSS.get(position);
+                        // 跳转到新的Activity
+                        Intent intent = new Intent(context, SecondActivity.class);
+                        intent.putExtra("itemData", itemData);
+                        intent.putExtra("itemId", itemId);
+                        context.startActivity(intent);
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onClick(View view) {
+
         }
     }
 }

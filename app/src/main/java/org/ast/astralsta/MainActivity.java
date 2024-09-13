@@ -1,11 +1,13 @@
 package org.ast.astralsta;
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.util.Calendar;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -27,10 +29,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.AutoDetectParser;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,13 +47,16 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private DatabaseHelper databaseHelper;
+    public static Context context;
     private MyAdapter adapter;
-    private List<String> items = new ArrayList<>();
+    public static List<String> items = new ArrayList<>();
+    public static List<Integer> itemsSSS = new ArrayList<>();
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
         databaseHelper = new DatabaseHelper(this);
         // 初始化侧边菜单
         initNavigationDrawer();
@@ -71,8 +81,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         adapter = new MyAdapter(items);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-        writeData();
+        readData();
 
     }
     private void showMonthPicker() {
@@ -145,33 +156,67 @@ public class MainActivity extends AppCompatActivity {
                 content.append(line).append("\n");
             }
             String fileContent = content.toString();
-            fileContent = fileContent.split("交易单号,商户单号,备注")[1];
-            String data[] = fileContent.split("\n");
-            int i = 0;
-            int i2 = 0;
-            for (String line2 : data) {
-                Log.d("File Content", line2);
-                try {
-                    double a = Double.parseDouble(line2.split(",")[5].replace("¥",""));
-                    if(line2.split(",")[4].equals("支出")) {
-                        a = a * -1;
-                    }
-                    Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[3],  a, line2.split(",")[8], line2.split(",")[6]);
-                    Log.d("Item", item.toGeShiHua());
-                    if(databaseHelper.queryByCODE(item.getCode()).getCount() == 0) {
-                        i2 ++;
-                        databaseHelper.addItem(item);
-                        items.add(item.toGeShiHua());
-                        adapter.notifyItemInserted(items.size() - 1);
-                    }else {
-                        i ++;
-                        Toast.makeText(this, "数据已存在", Toast.LENGTH_SHORT);
-                    }
-                }catch (Exception e) {
+            if(fileContent.contains("微信支付账单明细列表")) {
+                fileContent = fileContent.split("交易单号,商户单号,备注")[1];
+                String data[] = fileContent.split("\n");
+                int i = 0;
+                int i2 = 0;
+                for (String line2 : data) {
+                    Log.d("File Content", line2);
+                    try {
+                        double a = Double.parseDouble(line2.split(",")[5].replace("¥",""));
+                        if(line2.split(",")[4].equals("支出")) {
+                            a = a * -1;
+                        }
+                        Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[3],  a, line2.split(",")[8], line2.split(",")[6]);
+                        Log.d("Item", item.toGeShiHua());
+                        if(databaseHelper.queryByCODE(item.getCode()).getCount() == 0) {
+                            i2 ++;
+                            databaseHelper.addItem(item);
+                            items.add(item.toGeShiHua());
+                            itemsSSS.add(item.getId());
+                            adapter.notifyItemInserted(items.size() - 1);
+                        }else {
+                            i ++;
+                            Toast.makeText(this, "数据已存在", Toast.LENGTH_SHORT);
+                        }
+                    }catch (Exception e) {
 
+                    }
                 }
+                Toast.makeText(this, "微信 已导入" + i2 + "条数据，跳过" + i + "条数据", Toast.LENGTH_SHORT).show();
+            }else {
+                Log.d("File Content", fileContent);
+                fileContent = fileContent.split(",交易订单号,商家订单号,备注,")[1];
+                String data[] = fileContent.split("\n");
+                int i = 0;
+                int i2 = 0;
+                for (String line2 : data) {
+                    Log.d("File Content", line2);
+                    try {
+                        double a = Double.parseDouble(line2.split(",")[5].replace("¥",""));
+                        if(line2.split(",")[5].equals("支出")) {
+                            a = a * -1;
+                        }
+                        Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[4],  a, line2.split(",")[9], line2.split(",")[7]);
+                        Log.d("Item", item.toGeShiHua());
+                        if(databaseHelper.queryByCODE(item.getCode()).getCount() == 0) {
+                            i2 ++;
+                            databaseHelper.addItem(item);
+                            items.add(item.toGeShiHua());
+                            itemsSSS.add(item.getId());
+                            adapter.notifyItemInserted(items.size() - 1);
+                        }else {
+                            i ++;
+                            Toast.makeText(this, "数据已存在", Toast.LENGTH_SHORT);
+                        }
+                    }catch (Exception e) {
+
+                    }
+                }
+                Toast.makeText(this, "支付宝 已导入" + i2 + "条数据，跳过" + i + "条数据", Toast.LENGTH_SHORT).show();
+
             }
-            Toast.makeText(this, "已导入" + i2 + "条数据，跳过" + i + "条数据", Toast.LENGTH_SHORT).show();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -208,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     @SuppressLint("Range")
-    public void writeData() {
+    public void readData() {
         // 获取可读的数据库实例
         SQLiteDatabase db = new DatabaseHelper(this).getReadableDatabase();
 
@@ -234,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
                 String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
                 Item item = new Item(id, time, to, good, inOut, code, enumValue);
                 items.add(item.toGeShiHua());
+                itemsSSS.add(item.getId());
                 adapter.notifyItemInserted(items.size() - 1);
 
                 // 处理每一行数据
@@ -245,4 +291,15 @@ public class MainActivity extends AppCompatActivity {
         cursor.close();
         db.close();
     }
+    private static String convertToUtf8(String encodedString) {
+        try {
+            Charset inputCharset = Charset.forName("Windows-1252");
+            byte[] bytes = encodedString.getBytes(inputCharset);
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            System.err.println("Error converting string: " + e.getMessage());
+            return null;
+        }
+    }
+
 }

@@ -94,6 +94,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {cODE};
         return db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
     }
+    public Cursor queryById(String id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {COLUMN_ID, COLUMN_TIME, COLUMN_TO, COLUMN_GOOD, COLUMN_IN_OUT, COLUMN_CODE, COLUMN_ENUM};
+        String selection = COLUMN_ID + " = ?";
+        String[] selectionArgs = {id};
+        return db.query(TABLE_NAME, columns, selection, selectionArgs, null, null, null);
+    }
     public void clearAllData() {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NAME, null, null);

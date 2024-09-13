@@ -53,4 +53,17 @@ public class Item {
         }
         return "商品" + good + "\n 价格:" + in_out;
     }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", time='" + time + '\'' +
+                ", to='" + to + '\'' +
+                ", good='" + good + '\'' +
+                ", in_out=" + in_out +
+                ", code='" + code + '\'' +
+                ", enumValue='" + enumValue + '\'' +
+                '}';
+    }
 }
