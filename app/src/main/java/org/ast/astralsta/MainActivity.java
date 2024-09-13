@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Toast.makeText(this, "微信 已导入" + i2 + "条数据，跳过" + i + "条数据", Toast.LENGTH_SHORT).show();
             }else {
+                fileContent = convertToUtf8(fileContent);
                 Log.d("File Content", fileContent);
                 fileContent = fileContent.split(",交易订单号,商家订单号,备注,")[1];
                 String data[] = fileContent.split("\n");
