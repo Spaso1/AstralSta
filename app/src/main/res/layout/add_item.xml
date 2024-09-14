@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="AstralSta 添加数据"
+                android:textSize="20dp"
+                android:textColor="@color/white"
+                android:padding="10dp"
+                android:id="@+id/textView"
+                android:layout_margin="10dp"
+                android:layout_weight="1">
+        </TextView>
+    </androidx.appcompat.widget.Toolbar>
+    <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" android:id="@+id/tableRow">
+
+    </TableRow>
+    <Button
+            android:id="@+id/btn_pick_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_margin="16dp"
+            android:textColor="#59D38A"
+            android:text="上传数据文件" app:layout_anchorGravity="end|bottom" app:layout_anchor="@+id/tableRow"/>
+    <Button
+            android:text="添加"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="bottom|center"
+            app:layout_anchor="@+id/tableRow" android:id="@+id/button3"/>
+    <Button
+            android:text="返回"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="start|bottom"
+            app:layout_anchor="@+id/tableRow" android:id="@+id/button5"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private MyAdapter adapter;
     public static List<String> items = new ArrayList<>();
     public static List<Integer> itemsSSS = new ArrayList<>();
+    List<Item> events = new ArrayList<>();
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,9 +61,21 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         // 初始化侧边菜单
         initNavigationDrawer();
+        Button btn = findViewById(R.id.button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setContentView(R.layout.add_item);
+                Button btnPickFile = findViewById(R.id.btn_pick_file);
+                btnPickFile.setOnClickListener(v2 -> pickFile());
+                Button btn5 = findViewById(R.id.button5);
+                btn5.setOnClickListener(v3 -> {
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(intent);
+                });
+            }
+        });
 
-        Button btnPickFile = findViewById(R.id.btn_pick_file);
-        btnPickFile.setOnClickListener(v -> pickFile());
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         // 初始化 Toolbar
@@ -83,6 +96,10 @@ public class MainActivity extends AppCompatActivity {
         adapter = new MyAdapter(items);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+        int spaceInPixels = 16; // 例如，16dp
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.addItemDecoration(new SpaceItemDecoration(spaceInPixels));
+
         readData();
 
     }
@@ -99,6 +116,22 @@ public class MainActivity extends AppCompatActivity {
                 // 因为我们只关心月份，这里可以忽略year和day
                 String selectedMonthStr = String.format("%02d", (selectedMonth + 1));
                 Toast.makeText(getApplicationContext(), "您选择了月份：" + selectedMonthStr, Toast.LENGTH_SHORT).show();
+                Button btn = findViewById(R.id.button_select_month_year);
+                btn.setText(selectedMonthStr);
+                items.clear();
+                itemsSSS.clear();
+                int sum = 0;
+                for (Item item : events) {
+                    if (item.getDateTime().getMonthValue() == selectedMonth + 1) {
+                        items.add(item.toGeShiHua());
+                        itemsSSS.add(item.getId());
+                        adapter.notifyDataSetChanged();
+                        adapter.notifyItemInserted(items.size() - 1);
+                        sum += item.getIn_out();
+                    }
+                }
+                TextView textView = findViewById(R.id.textView6);
+                textView.setText("本月流水:" + sum);
             }
         }, year, month, day).show();
     }
@@ -186,7 +219,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Toast.makeText(this, "微信 已导入" + i2 + "条数据，跳过" + i + "条数据", Toast.LENGTH_SHORT).show();
             }else {
-                fileContent = convertToUtf8(fileContent);
+                InputStream inputStream2 = getContentResolver().openInputStream(uri);
+                BufferedReader reader2 = new BufferedReader(new InputStreamReader(inputStream2,"GBK"));
+                content = new StringBuilder();
+                line= "";
+                while ((line = reader2.readLine()) != null) {
+                    content.append(line).append("\n");
+                }
+                fileContent = content.toString();
                 Log.d("File Content", fileContent);
                 fileContent = fileContent.split(",交易订单号,商家订单号,备注,")[1];
                 String data[] = fileContent.split("\n");
@@ -195,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                 for (String line2 : data) {
                     Log.d("File Content", line2);
                     try {
-                        double a = Double.parseDouble(line2.split(",")[5].replace("¥",""));
+                        double a = Double.parseDouble(line2.split(",")[6].replace("¥",""));
                         if(line2.split(",")[5].equals("支出")) {
                             a = a * -1;
                         }
@@ -212,11 +252,11 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(this, "数据已存在", Toast.LENGTH_SHORT);
                         }
                     }catch (Exception e) {
-
+                        Log.d("Error", e.getMessage());
                     }
                 }
                 Toast.makeText(this, "支付宝 已导入" + i2 + "条数据，跳过" + i + "条数据", Toast.LENGTH_SHORT).show();
-
+                readData();
             }
 
         } catch (IOException e) {
@@ -224,7 +264,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
-    private String readFile() {
+        private String readFile() {
         StringBuilder content = new StringBuilder();
         try {
             FileInputStream fis = openFileInput("data.prop");
@@ -255,6 +295,8 @@ public class MainActivity extends AppCompatActivity {
     }
     @SuppressLint("Range")
     public void readData() {
+        items.clear();
+        itemsSSS.clear();
         // 获取可读的数据库实例
         SQLiteDatabase db = new DatabaseHelper(this).getReadableDatabase();
 
@@ -279,9 +321,12 @@ public class MainActivity extends AppCompatActivity {
                 String code = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_CODE));
                 String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
                 Item item = new Item(id, time, to, good, inOut, code, enumValue);
-                items.add(item.toGeShiHua());
-                itemsSSS.add(item.getId());
-                adapter.notifyItemInserted(items.size() - 1);
+                events.add(item);
+                // 使用 List.sort(Comparator) 排序
+
+
+
+
 
                 // 处理每一行数据
                 Log.d("Database", "ID: " + id + ", Time: " + time + ", To: " + to + ", Good: " + good + ", InOut: " + inOut + ", Code: " + code + ", Enum: " + enumValue);
@@ -291,10 +336,19 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(String.valueOf(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)));
         cursor.close();
         db.close();
+
+        events.sort(Comparator.comparing(Item::getDateTime));
+
+        // 输出排序后的结果
+        for (Item item : events) {
+            items.add(item.toGeShiHua());
+            itemsSSS.add(item.getId());
+            adapter.notifyItemInserted(items.size() - 1);
+        }
     }
     private static String convertToUtf8(String encodedString) {
         try {
-            Charset inputCharset = Charset.forName("Windows-1252");
+            Charset inputCharset = Charset.forName("GBK");
             byte[] bytes = encodedString.getBytes(inputCharset);
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (Exception e) {

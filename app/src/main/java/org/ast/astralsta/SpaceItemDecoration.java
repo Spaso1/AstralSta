@@ -14,8 +14,20 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-        // 只对最后一个item应用底部间距
-        if (parent.getChildAdapterPosition(view) == parent.getAdapter().getItemCount() - 1) {
+        // 获取当前项的位置
+        int position = parent.getChildAdapterPosition(view);
+
+        // 设置左边距
+        outRect.left = space / 2;
+        // 设置右边距
+        outRect.right = space / 2;
+        // 设置顶部边距
+        outRect.top = space;
+        // 设置底部边距
+        // 如果不是最后一项，则添加底部边距
+        if (position == parent.getAdapter().getItemCount() - 1) {
+            outRect.bottom = 0; // 最后一项不设底部边距
+        } else {
             outRect.bottom = space;
         }
     }

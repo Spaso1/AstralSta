@@ -45,13 +45,7 @@
                 android:background="#ADD8E6"/>
 
     </androidx.drawerlayout.widget.DrawerLayout>
-    <Button
-            android:id="@+id/btn_pick_file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_margin="16dp"
-            android:text="Pick File"/>
+
     <Button
             android:text="选择月份"
             android:layout_width="wrap_content"
@@ -62,5 +56,10 @@
             android:layout_width="146dp"
             android:layout_height="68dp" app:layout_anchorGravity="start|bottom"
             app:layout_anchor="@+id/drawer_layout" android:id="@+id/textView6"/>
+    <Button
+            android:text="添加数据"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="bottom|center"
+            app:layout_anchor="@+id/drawer_layout" android:id="@+id/button"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
