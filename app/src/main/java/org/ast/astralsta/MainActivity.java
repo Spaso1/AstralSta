@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 创建DatePickerDialog实例
         new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
                 // 因为我们只关心月份，这里可以忽略year和day
@@ -151,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
             switch (position) {
                 case 0:
                     // Handle Home
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    startActivity(intent);
                     break;
                 case 1:
                     // Handle Settings
