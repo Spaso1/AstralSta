@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         navigationDrawer = findViewById(R.id.navigation_drawer);
 
         // 设置侧边菜单项
-        String[] items = {"Home", "Settings", "About"};
+        String[] items = {"Home", "每日流水", "About"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
         navigationDrawer.setAdapter(adapter);
 
