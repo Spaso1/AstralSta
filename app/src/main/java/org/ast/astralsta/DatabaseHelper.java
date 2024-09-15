@@ -71,6 +71,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String time = item.getTime();
         String to = item.getTo();
         String good = item.getGood();
+        good = good.replace("\"","");
+
         double in_out = item.getIn_out();
         String code = item.getCode();
         String enumValue = item.getEnumValue();
@@ -129,5 +131,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return sum;
     }
+    // 更新记录的方法
+    public void updateTransaction(Item item) {
+        SQLiteDatabase db = getWritableDatabase();
+        long id = item.getId();
+        String time = item.getTime();
+        String to = item.getTo();
+        String good = item.getGood();
+        double inOut = item.getIn_out();
+        String code = item.getCode();
+        String enumType = item.getEnumValue();
 
+        String updateQuery = "UPDATE " + TABLE_NAME + " SET " +
+                COLUMN_TIME + " = ?, " +
+                COLUMN_TO + " = ?, " +
+                COLUMN_GOOD + " = ?, " +
+                COLUMN_IN_OUT + " = ?, " +
+                COLUMN_CODE + " = ?, " +
+                COLUMN_ENUM + " = ? " +
+                "WHERE " + COLUMN_ID + " = ?";
+
+        db.execSQL(updateQuery, new Object[]{time, to, good, inOut, code, enumType, id});
+    }
 }

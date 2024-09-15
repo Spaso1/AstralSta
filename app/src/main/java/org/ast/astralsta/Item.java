@@ -3,6 +3,7 @@ package org.ast.astralsta;
 import android.util.Log;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Item  implements Comparable<Item> {
@@ -22,13 +23,11 @@ public class Item  implements Comparable<Item> {
         this.in_out = in_out;
         this.code = code;
         this.enumValue = enumValue;
-        Log.d("Item", "Item created with time: " + time);
         try {
             this.dateTime = LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
         }catch (Exception e) {
             this.dateTime = LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
-
     }
 
     public void setId(int id) {
@@ -101,9 +100,9 @@ public class Item  implements Comparable<Item> {
 
     public String toGeShiHua() {
         if (in_out > 0) {
-            return "收入" + good +"+" + in_out;
+            return "收入:" + good +"+" + in_out;
         }
-        return "商品" + good + "\n 价格:" + in_out;
+        return "支出:" + good + "\n 价格:" + in_out;
     }
 
     @Override

@@ -1,15 +1,37 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical"
-              android:padding="16dp"
-              android:background="@drawable/rounded_layout">  <!-- 应用样式 -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:padding="16dp"
+                  android:background="@drawable/rounded_layout">  <!-- 应用样式 -->
 
-    <TextView
-            android:id="@+id/textView"
+        <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+    </LinearLayout>
+    <View
+            android:id="@+id/divider"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_height="1dp"
+            android:background="#FF0000"
+            android:visibility="gone" />
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginLeft="40mm"
+              android:textColor="#009688"
+              android:id="@+id/textViewRRR"
+    >
 
-</LinearLayout>
+    </TextView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+

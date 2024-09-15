@@ -17,7 +17,7 @@
     </androidx.appcompat.widget.Toolbar>
     <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent" android:id="@+id/tableRow2">
 
     </TableRow>
     <TextView
@@ -45,7 +45,18 @@
             android:id="@+id/textView5"
             android:layout_marginTop="30mm"
             android:layout_width="394dp"
+            android:inputType="number"
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"/>
+    <Button
+            android:text="返回"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="start|bottom"
+            app:layout_anchor="@+id/tableRow2" android:id="@+id/back"/>
+    <Button
+            android:text="保存修改"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="end|bottom"
+            app:layout_anchor="@+id/tableRow2" android:id="@+id/change"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

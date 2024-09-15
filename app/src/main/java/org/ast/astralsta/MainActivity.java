@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.util.Log;
 import android.util.TypedValue;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private MyAdapter adapter;
     public static List<String> items = new ArrayList<>();
     public static List<Integer> itemsSSS = new ArrayList<>();
+    public static Map<String,Item> itemMap = new HashMap<>();
     List<Item> events = new ArrayList<>();
     @SuppressLint("MissingInflatedId")
     @Override
@@ -99,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
         int spaceInPixels = 16; // 例如，16dp
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new SpaceItemDecoration(spaceInPixels));
-
         readData();
 
     }
@@ -121,13 +122,16 @@ public class MainActivity extends AppCompatActivity {
                 btn.setText(selectedMonthStr);
                 items.clear();
                 itemsSSS.clear();
+                adapter.notifyDataSetChanged();
                 int sum = 0;
+                String temp = "";
                 for (Item item : events) {
                     if (item.getDateTime().getMonthValue() == selectedMonth + 1) {
                         items.add(item.toGeShiHua());
                         itemsSSS.add(item.getId());
                         adapter.notifyDataSetChanged();
                         adapter.notifyItemInserted(items.size() - 1);
+
                         sum += item.getIn_out();
                     }
                 }
@@ -300,6 +304,8 @@ public class MainActivity extends AppCompatActivity {
     public void readData() {
         items.clear();
         itemsSSS.clear();
+        events.clear();
+        adapter.notifyDataSetChanged();
         // 获取可读的数据库实例
         SQLiteDatabase db = new DatabaseHelper(this).getReadableDatabase();
 
@@ -320,16 +326,13 @@ public class MainActivity extends AppCompatActivity {
                 String time = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TIME));
                 String to = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TO));
                 String good = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOOD));
+                good = good.replace("\"","");
                 double inOut = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_IN_OUT));
                 String code = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_CODE));
                 String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
                 Item item = new Item(id, time, to, good, inOut, code, enumValue);
                 events.add(item);
                 // 使用 List.sort(Comparator) 排序
-
-
-
-
 
                 // 处理每一行数据
                 Log.d("Database", "ID: " + id + ", Time: " + time + ", To: " + to + ", Good: " + good + ", InOut: " + inOut + ", Code: " + code + ", Enum: " + enumValue);
@@ -341,12 +344,12 @@ public class MainActivity extends AppCompatActivity {
         db.close();
 
         events.sort(Comparator.comparing(Item::getDateTime));
-
         // 输出排序后的结果
         for (Item item : events) {
             items.add(item.toGeShiHua());
             itemsSSS.add(item.getId());
             adapter.notifyItemInserted(items.size() - 1);
+            itemMap.put(item.toGeShiHua(), item);
         }
     }
     private static String convertToUtf8(String encodedString) {
