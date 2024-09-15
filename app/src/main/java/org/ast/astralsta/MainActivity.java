@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 TextView textView = findViewById(R.id.textView6);
-                textView.setText("本月流水:" + sum);
+                textView.setText("本月收支 " + sum + "\n本月记录 " + items.size());
             }
         }, year, month, day).show();
     }
@@ -319,9 +319,10 @@ public class MainActivity extends AppCompatActivity {
                 null, // 有分组时过滤
                 null // 排序
         );
-
+        int a = 0;
         if (cursor.moveToFirst()) {
             do {
+                a++;
                 int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
                 String time = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TIME));
                 String to = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TO));
@@ -339,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
         }
         TextView textView = findViewById(R.id.textView6);
-        textView.setText(String.valueOf(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)));
+        textView.setText("总收支 "+ String.valueOf(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)) + "\n总共 " + a + " 条记录");
         cursor.close();
         db.close();
 
