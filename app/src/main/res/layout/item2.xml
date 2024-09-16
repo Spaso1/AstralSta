@@ -59,4 +59,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:layout_anchorGravity="end|bottom"
             app:layout_anchor="@+id/tableRow2" android:id="@+id/change"/>
+    <RadioButton
+            android:text="RadioButton"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="40mm"
+            android:layout_height="wrap_content"
+            android:id="@+id/radioButton1"/>
+    <RadioButton
+            android:text="RadioButton"
+            android:layout_marginTop="45mm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/radioButton2"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

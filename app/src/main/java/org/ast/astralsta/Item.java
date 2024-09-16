@@ -6,16 +6,18 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-public class Item  implements Comparable<Item> {
+public class Item  {
     private int id;
     private String time;
     private String to;
     private String good;
+
     private double in_out;
     private String code;
     private String enumValue;
     private LocalDateTime dateTime;
-    public Item(int id, String time, String to, String good, double in_out, String code, String enumValue) {
+    private String good_enum;
+    public Item(int id, String time, String to, String good, double in_out, String code, String enumValue, String good_enum) {
         this.id = id;
         this.time = time;
         this.to = to;
@@ -23,6 +25,7 @@ public class Item  implements Comparable<Item> {
         this.in_out = in_out;
         this.code = code;
         this.enumValue = enumValue;
+        this.good_enum = good_enum;
         try {
             this.dateTime = LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
         }catch (Exception e) {
@@ -66,10 +69,14 @@ public class Item  implements Comparable<Item> {
         this.dateTime = dateTime;
     }
 
-    @Override
-    public int compareTo(Item other) {
-        return this.dateTime.compareTo(other.dateTime); // 根据日期时间排序
+    public String getGood_enum() {
+        return good_enum;
     }
+
+    public void setGood_enum(String good_enum) {
+        this.good_enum = good_enum;
+    }
+
     public int getId() {
         return id;
     }

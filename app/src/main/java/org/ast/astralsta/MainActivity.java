@@ -39,6 +39,7 @@ import org.apache.tika.parser.AutoDetectParser;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,17 +48,18 @@ public class MainActivity extends AppCompatActivity {
     private ListView navigationDrawer;
 
     private RecyclerView recyclerView;
-    private DatabaseHelper databaseHelper;
+    public static DatabaseHelper databaseHelper;
     public static Context context;
     private MyAdapter adapter;
-    public static List<String> items = new ArrayList<>();
-    public static List<Integer> itemsSSS = new ArrayList<>();
-    public static Map<String,Item> itemMap = new HashMap<>();
-    List<Item> events = new ArrayList<>();
+    public static Vector<String> items = new Vector<>();
+    public static Vector<Integer> itemsSSS = new Vector<>();
+    public static ConcurrentHashMap<String,Item> itemMap = new ConcurrentHashMap<>();
+    private Vector<Item> events = new Vector<>();
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         context = this;
         databaseHelper = new DatabaseHelper(this);
@@ -123,16 +125,14 @@ public class MainActivity extends AppCompatActivity {
                 items.clear();
                 itemsSSS.clear();
                 adapter.notifyDataSetChanged();
-                int sum = 0;
+                double sum = databaseHelper.sumInOutByMonth( selectedYear +"-" + selectedMonthStr);
                 String temp = "";
                 for (Item item : events) {
-                    if (item.getDateTime().getMonthValue() == selectedMonth + 1) {
-                        items.add(item.toGeShiHua());
+                    if (item.getTime().contains("-" + selectedMonthStr + "-")) {
+                        items.add(item.getTime());
                         itemsSSS.add(item.getId());
                         adapter.notifyDataSetChanged();
                         adapter.notifyItemInserted(items.size() - 1);
-
-                        sum += item.getIn_out();
                     }
                 }
                 TextView textView = findViewById(R.id.textView6);
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                         if(line2.split(",")[4].equals("支出")) {
                             a = a * -1;
                         }
-                        Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[3],  a, line2.split(",")[8], line2.split(",")[6]);
+                        Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[3],  a, line2.split(",")[8], line2.split(",")[6],"未知");
                         Log.d("Item", item.toGeShiHua());
                         if(databaseHelper.queryByCODE(item.getCode()).getCount() == 0) {
                             i2 ++;
@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
                         if(line2.split(",")[5].equals("支出")) {
                             a = a * -1;
                         }
-                        Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[4],  a, line2.split(",")[9], line2.split(",")[7]);
+                        Item item = new Item(0, line2.split(",")[0], line2.split(",")[2], line2.split(",")[4],  a, line2.split(",")[9], line2.split(",")[7],"未知");
                         Log.d("Item", item.toGeShiHua());
                         if(databaseHelper.queryByCODE(item.getCode()).getCount() == 0) {
                             i2 ++;
@@ -300,25 +300,14 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "写入文件失败", Toast.LENGTH_SHORT).show();
         }
     }
-    @SuppressLint("Range")
+    @SuppressLint({"Range", "SetTextI18n", "NotifyDataSetChanged"})
     public void readData() {
         items.clear();
         itemsSSS.clear();
         events.clear();
         adapter.notifyDataSetChanged();
         // 获取可读的数据库实例
-        SQLiteDatabase db = new DatabaseHelper(this).getReadableDatabase();
-
-        // 查询数据
-        Cursor cursor = db.query(
-                DatabaseHelper.TABLE_NAME, // 表名
-                new String[]{DatabaseHelper.COLUMN_ID, DatabaseHelper.COLUMN_TIME, DatabaseHelper.COLUMN_TO, DatabaseHelper.COLUMN_GOOD, DatabaseHelper.COLUMN_IN_OUT, DatabaseHelper.COLUMN_CODE, DatabaseHelper.COLUMN_ENUM}, // 列名
-                null, // 选择条件
-                null, // 选择参数
-                null, // 分组
-                null, // 有分组时过滤
-                null // 排序
-        );
+        Cursor cursor = databaseHelper.que();
         int a = 0;
         if (cursor.moveToFirst()) {
             do {
@@ -331,10 +320,21 @@ public class MainActivity extends AppCompatActivity {
                 double inOut = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_IN_OUT));
                 String code = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_CODE));
                 String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
-                Item item = new Item(id, time, to, good, inOut, code, enumValue);
-                events.add(item);
-                // 使用 List.sort(Comparator) 排序
+                String goodenum = "未知";
+                try {
+                    goodenum = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOODENUM));
+                }catch (Exception e) {
+                    Item item = new Item(0, time, to, good, inOut, code, enumValue,"未知");
+                    databaseHelper.updateTransaction(item);
+                }
 
+                Item item = new Item(id, time, to, good, inOut, code, enumValue, goodenum);
+
+                items.add(item.getTime());
+                itemsSSS.add(item.getId());
+                adapter.notifyDataSetChanged();
+                events.add(item);
+                itemMap.put(item.getTime(), item);
                 // 处理每一行数据
                 Log.d("Database", "ID: " + id + ", Time: " + time + ", To: " + to + ", Good: " + good + ", InOut: " + inOut + ", Code: " + code + ", Enum: " + enumValue);
             } while (cursor.moveToNext());
@@ -342,16 +342,7 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = findViewById(R.id.textView6);
         textView.setText("总收支 "+ String.valueOf(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)) + "\n总共 " + a + " 条记录");
         cursor.close();
-        db.close();
 
-        events.sort(Comparator.comparing(Item::getDateTime));
-        // 输出排序后的结果
-        for (Item item : events) {
-            items.add(item.toGeShiHua());
-            itemsSSS.add(item.getId());
-            adapter.notifyItemInserted(items.size() - 1);
-            itemMap.put(item.toGeShiHua(), item);
-        }
     }
     private static String convertToUtf8(String encodedString) {
         try {

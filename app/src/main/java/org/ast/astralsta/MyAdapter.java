@@ -32,6 +32,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_layout, parent, false);
+        Log.d("TAG", "onCreateViewHolder: " );
         return new MyViewHolder(itemView);
     }
 
@@ -42,11 +43,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.itemView.findViewById(R.id.divider).setVisibility(View.GONE);
         Item a =itemMap.get(data.get(position));
         String time = a.getTime();
-        String formattedDate = convertTimeFormat(time);
+        holder.textView.setText(a.toGeShiHua());
         if(a.getIn_out() < 0) {
             holder.textVie2.setTextColor(R.color.color_red);
         }
-        holder.textVie2.setText(formattedDate);
+        holder.textVie2.setText(time);
     }
     public static String convertTimeFormat(String inputDate) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

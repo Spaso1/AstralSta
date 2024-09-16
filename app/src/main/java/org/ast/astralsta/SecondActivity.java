@@ -32,7 +32,8 @@ public class SecondActivity extends AppCompatActivity {
         double inOut = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_IN_OUT));
         String code = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_CODE));
         String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
-        Item item = new Item(id, time, to, good, inOut, code, enumValue);
+        String enumalue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOODENUM));
+        Item item = new Item(id, time, to, good, inOut, code, enumValue, enumalue);
         textView = findViewById(R.id.textView);
         textView.setText(item.getGood());
         textView2 = findViewById(R.id.textView5);
