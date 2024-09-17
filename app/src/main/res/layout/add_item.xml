@@ -8,7 +8,7 @@
     <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -32,19 +32,18 @@
             android:layout_height="match_parent" android:id="@+id/tableRow">
 
 
-
     </TableRow>
     <TextView
             android:text="商品"
             android:textSize="30dp"
-            android:layout_marginTop="10mm"
+            android:layout_marginTop="20mm"
             android:layout_width="92dp"
             android:layout_height="wrap_content"
             android:id="@+id/textView7"/>
 
     <EditText
             android:textSize="18dp"
-            android:layout_marginTop="10mm"
+            android:layout_marginTop="20mm"
             android:layout_width="306dp"
             android:layout_marginLeft="10mm"
             android:layout_height="wrap_content"
@@ -53,13 +52,13 @@
     <TextView
             android:text="价格"
             android:textSize="30dp"
-            android:layout_marginTop="15mm"
+            android:layout_marginTop="30mm"
             android:layout_width="92dp"
             android:layout_height="wrap_content"
             android:id="@+id/textView8"/>
     <EditText
             android:textSize="18dp"
-            android:layout_marginTop="15mm"
+            android:layout_marginTop="30mm"
             android:layout_marginLeft="10mm"
             android:layout_width="306dp"
             android:layout_height="wrap_content"
@@ -67,25 +66,17 @@
     <TextView
             android:text="种类"
             android:textSize="30dp"
-            android:layout_marginTop="20mm"
+            android:layout_marginTop="40mm"
             android:layout_width="92dp"
             android:layout_height="wrap_content"
             android:id="@+id/textView9"/>
     <EditText
             android:textSize="18dp"
             android:id="@+id/editView9"
-            android:layout_marginTop="20mm"
+            android:layout_marginTop="40mm"
             android:layout_marginLeft="10mm"
             android:layout_width="306dp"
             android:layout_height="wrap_content"/>
-    <Button
-            android:id="@+id/btn_pick_file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_margin="16dp"
-            android:textColor="#59D38A"
-            android:text="上传数据文件" app:layout_anchorGravity="end|bottom" app:layout_anchor="@+id/tableRow"/>
     <Button
             android:text="添加"
             android:layout_width="wrap_content"
@@ -101,4 +92,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:layout_anchorGravity="start|center"
             app:layout_anchor="@+id/tableRow" android:id="@+id/button_select_month_year2"/>
+    <Button
+            android:id="@+id/btn_pick_file"
+            android:layout_width="wrap_content"
+            android:layout_height="41dp"
+            android:text="导入"
+            tools:ignore="InOrMmUsage" app:layout_anchorGravity="end|bottom" app:layout_anchor="@+id/tableRow"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

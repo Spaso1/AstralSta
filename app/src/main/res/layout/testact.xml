@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <!-- 顶部菜单栏 -->
+    <LinearLayout
+            android:id="@+id/top_menu_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="菜单标题"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:layout_gravity="center_vertical"/>
+
+    <!-- 其他菜单项 -->
+</LinearLayout>
+
+        <!-- 弹性布局容器 -->
+<com.google.android.flexbox.FlexboxLayout
+android:id="@+id/flex_container"
+android:layout_width="match_parent"
+android:layout_height="0dp"
+android:layout_marginTop="?attr/actionBarSize"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:alignItems="stretch"
+        app:flexDirection="column">
+
+
+        <!-- 其他Flexbox子项 -->
+        </com.google.android.flexbox.FlexboxLayout>
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical" />
+    <Button
+            android:text="选择月份"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="end|bottom"
+            app:layout_anchor="@+id/drawer_layout" android:id="@+id/button_select_month_year"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="146dp"
+            android:layout_height="68dp" app:layout_anchorGravity="start|bottom"
+            app:layout_anchor="@+id/drawer_layout" android:id="@+id/textView6"/>
+    <Button
+            android:text="添加数据"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="bottom|center"
+            app:layout_anchor="@+id/drawer_layout" android:id="@+id/button"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="177dp"
+            android:textColor="@color/white"
+            android:layout_height="63dp" app:layout_anchorGravity="end|top"
+            app:layout_anchor="@+id/toolbar"
+            android:id="@+id/textView2"/>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

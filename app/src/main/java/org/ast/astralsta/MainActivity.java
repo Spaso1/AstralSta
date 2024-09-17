@@ -9,8 +9,7 @@ import android.graphics.Color;
 import android.icu.util.Calendar;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,8 +20,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.MenuItem;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -59,12 +56,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         setContentView(R.layout.activity_main);
         context = this;
         databaseHelper = new DatabaseHelper(this);
         // 初始化侧边菜单
-        initNavigationDrawer();
         Button btn = findViewById(R.id.button);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,12 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        // 初始化 Toolbar
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        // 设置返回箭头
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         Button buttonSelectMonthYear = findViewById(R.id.button_select_month_year);
 
@@ -202,35 +194,6 @@ public class MainActivity extends AppCompatActivity {
                 textView2.setText("收入 " + scr + "\n支出 " + add);
             }
         }, year, month, day).show();
-    }
-
-
-    private void initNavigationDrawer() {
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navigationDrawer = findViewById(R.id.navigation_drawer);
-
-        // 设置侧边菜单项
-        String[] items = {"Home", "每日流水", "About"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, items);
-        navigationDrawer.setAdapter(adapter);
-
-        // 处理侧边菜单项点击事件
-        navigationDrawer.setOnItemClickListener((parent, view, position, id) -> {
-            switch (position) {
-                case 0:
-                    // Handle Home
-                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    break;
-                case 1:
-                    // Handle Settings
-                    break;
-                case 2:
-                    // Handle About
-                    break;
-            }
-            drawerLayout.closeDrawer(GravityCompat.START);
-        });
     }
 
     private void pickFile() {
