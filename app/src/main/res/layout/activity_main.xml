@@ -61,5 +61,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:layout_anchorGravity="bottom|center"
             app:layout_anchor="@+id/drawer_layout" android:id="@+id/button"/>
+    <TextView
+            android:text="TextView"
+            android:layout_width="177dp"
+            android:textColor="@color/white"
+            android:layout_height="63dp" app:layout_anchorGravity="end|top" app:layout_anchor="@+id/toolbar"
+            android:id="@+id/textView2"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

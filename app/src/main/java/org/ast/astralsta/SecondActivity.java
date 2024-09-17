@@ -17,6 +17,7 @@ import static org.ast.astralsta.MainActivity.context;
 public class SecondActivity extends AppCompatActivity {
     private EditText textView;
     private EditText textView2;
+    private EditText textView3;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +39,8 @@ public class SecondActivity extends AppCompatActivity {
         textView.setText(item.getGood());
         textView2 = findViewById(R.id.textView5);
         textView2.setText(inOut + "");
-
+        textView3 = findViewById(R.id.editView7);
+        textView3.setText(item.getGood_enum());
         Button button = findViewById(R.id.back);
         button.setOnClickListener(v -> {
             Intent intent = new Intent(SecondActivity.this, MainActivity.class);
@@ -50,6 +52,7 @@ public class SecondActivity extends AppCompatActivity {
             String inOut2 = textView2.getText().toString();
             item.setGood(good2);
             item.setIn_out(Double.parseDouble(inOut2));
+            item.setGood_enum(textView3.getText().toString());
             dbHelper.updateTransaction(item);
             Toast.makeText(context, "修改成功", Toast.LENGTH_SHORT).show();
         });

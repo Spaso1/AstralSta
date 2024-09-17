@@ -180,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
                 itemsSSS.clear();
                 adapter.notifyDataSetChanged();
                 double sum = databaseHelper.sumInOutByMonth( selectedYear +"-" + selectedMonthStr);
+                double add = 0;
+                double scr = 0;
                 String temp = "";
                 for (Item item : events) {
                     if (item.getTime().contains("-" + selectedMonthStr + "-")) {
@@ -187,10 +189,17 @@ public class MainActivity extends AppCompatActivity {
                         itemsSSS.add(item.getId());
                         adapter.notifyDataSetChanged();
                         adapter.notifyItemInserted(items.size() - 1);
+                        if(item.getIn_out() < 0) {
+                            add += item.getIn_out();
+                        }else {
+                            scr += item.getIn_out();
+                        }
                     }
                 }
                 TextView textView = findViewById(R.id.textView6);
                 textView.setText("本月收支 " + sum + "\n本月记录 " + items.size());
+                TextView textView2= findViewById(R.id.textView2);
+                textView2.setText("收入 " + scr + "\n支出 " + add);
             }
         }, year, month, day).show();
     }
@@ -362,7 +371,9 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         // 获取可读的数据库实例
         Cursor cursor = databaseHelper.que();
-        int a = 0;
+        double a = 0;
+        double add = 0;
+        double sca = 0;
         if (cursor.moveToFirst()) {
             do {
                 a++;
@@ -381,7 +392,12 @@ public class MainActivity extends AppCompatActivity {
                     Item item = new Item(0, time, to, good, inOut, code, enumValue,"未知");
                     databaseHelper.updateTransaction(item);
                 }
-
+                if(inOut > 0) {
+                    add += inOut;
+                }
+                if(inOut < 0) {
+                    sca += inOut;
+                }
                 Item item = new Item(id, time, to, good, inOut, code, enumValue, goodenum);
 
                 items.add(item.getTime());
@@ -395,6 +411,8 @@ public class MainActivity extends AppCompatActivity {
         }
         TextView textView = findViewById(R.id.textView6);
         textView.setText("总收支 "+ String.valueOf(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)) + "\n总共 " + a + " 条记录");
+        TextView textView7 = findViewById(R.id.textView2);
+        textView7.setText("支出 " + String.valueOf(sca).replace("-","") + "\n收入 " + String.valueOf(add));
         cursor.close();
 
     }

@@ -49,6 +49,20 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"/>
+    <TextView
+            android:text="种类"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="40mm"
+            android:textSize="18sp"
+
+            android:layout_height="wrap_content"/>
+    <EditText
+            android:id="@+id/editView7"
+            android:layout_marginTop="45mm"
+            android:layout_width="394dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
     <Button
             android:text="返回"
             android:layout_width="wrap_content"
@@ -59,16 +73,4 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:layout_anchorGravity="end|bottom"
             app:layout_anchor="@+id/tableRow2" android:id="@+id/change"/>
-    <RadioButton
-            android:text="RadioButton"
-            android:layout_width="wrap_content"
-            android:layout_marginTop="40mm"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioButton1"/>
-    <RadioButton
-            android:text="RadioButton"
-            android:layout_marginTop="45mm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioButton2"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
