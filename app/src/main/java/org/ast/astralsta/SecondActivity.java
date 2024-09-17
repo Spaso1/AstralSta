@@ -53,5 +53,6 @@ public class SecondActivity extends AppCompatActivity {
             dbHelper.updateTransaction(item);
             Toast.makeText(context, "修改成功", Toast.LENGTH_SHORT).show();
         });
+
     }
 }

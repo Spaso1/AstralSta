@@ -32,6 +32,7 @@
             android:layout_height="match_parent" android:id="@+id/tableRow">
 
 
+
     </TableRow>
     <TextView
             android:text="商品"
@@ -40,6 +41,7 @@
             android:layout_width="92dp"
             android:layout_height="wrap_content"
             android:id="@+id/textView7"/>
+
     <EditText
             android:textSize="18dp"
             android:layout_marginTop="10mm"
@@ -86,7 +88,6 @@
             android:text="上传数据文件" app:layout_anchorGravity="end|bottom" app:layout_anchor="@+id/tableRow"/>
     <Button
             android:text="添加"
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:layout_anchorGravity="bottom|center"
             app:layout_anchor="@+id/tableRow" android:id="@+id/button3"/>
@@ -95,4 +96,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:layout_anchorGravity="start|bottom"
             app:layout_anchor="@+id/tableRow" android:id="@+id/button5"/>
+    <Button
+            android:text="选择时间"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:layout_anchorGravity="start|center"
+            app:layout_anchor="@+id/tableRow" android:id="@+id/button_select_month_year2"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

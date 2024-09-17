@@ -73,6 +73,57 @@ public class MainActivity extends AppCompatActivity {
                 Button btnPickFile = findViewById(R.id.btn_pick_file);
                 btnPickFile.setOnClickListener(v2 -> pickFile());
                 Button btn5 = findViewById(R.id.button5);
+                Button button3 = findViewById(R.id.button3);
+                Button buttonSelectMonthYear2 = findViewById(R.id.button_select_month_year2);
+                final Calendar calendar = Calendar.getInstance();
+                final int[] mYear = {calendar.get(Calendar.YEAR)};
+                final int[] mMonth = {calendar.get(Calendar.MONTH)};
+                final int[] mDay = {calendar.get(Calendar.DAY_OF_MONTH)};
+                buttonSelectMonthYear2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, "请选择日期", Toast.LENGTH_SHORT).show();
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                // 当对话框中的日期被选择时，将选中的日期显示在TextView中
+                                mYear[0] = year;
+                                mMonth[0] = monthOfYear;
+                                mDay[0] = dayOfMonth;
+                                Toast.makeText(MainActivity.this, "选中的日期：" + year + "-" + (monthOfYear + 1) + "-" + dayOfMonth, Toast.LENGTH_SHORT).show();
+                            }
+                        }, mYear[0], mMonth[0], mDay[0]);
+                        datePickerDialog.show();
+                    }
+                });
+                button3.setOnClickListener(v4 -> {
+                    try {
+                        EditText godd = findViewById(R.id.editView7);
+                        String good = godd.getText().toString();
+                        EditText su = findViewById(R.id.editView8);
+                        String jiage = su.getText().toString();
+                        EditText en = findViewById(R.id.editView9);
+                        String enu = en.getText().toString();
+                        int a = (mMonth[0] + 1);
+                        String b = "";
+                        if(a < 10) {
+                            b = "0" + a;
+                        }else {
+                            b = String.valueOf(a);
+                        }
+                        String time = mYear[0] + "-" + b + "-" + mDay[0] + " 10:10:10";
+                        Item item = new Item(0, time, "未知", good, Double.parseDouble(jiage),String.valueOf(generateRandomIntUsingMath(1000000,200000000)) , enu, "默认");
+                        Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+                        databaseHelper.addItem(item);
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }catch (Exception e) {
+                        Toast.makeText(MainActivity.this, "请输入正确的数据", Toast.LENGTH_SHORT).show();
+                    }
+
+                });
+
+
                 btn5.setOnClickListener(v3 -> {
                     Intent intent = new Intent(MainActivity.this, MainActivity.class);
                     startActivity(intent);
@@ -105,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new SpaceItemDecoration(spaceInPixels));
         readData();
 
+    }
+    public static int generateRandomIntUsingMath(int min, int max) {
+        return (int)(Math.random() * (max - min + 1)) + min;
     }
     private void showMonthPicker() {
         final Calendar calendar = Calendar.getInstance();

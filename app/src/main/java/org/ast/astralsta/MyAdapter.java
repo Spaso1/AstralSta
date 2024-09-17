@@ -42,7 +42,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         holder.textView.setText(data.get(position));
         holder.itemView.findViewById(R.id.divider).setVisibility(View.GONE);
         Item a =itemMap.get(data.get(position));
-        String time = a.getTime();
+        String time = a.getTime().split(" ")[0];
         holder.textView.setText(a.toGeShiHua());
         if(a.getIn_out() < 0) {
             holder.textVie2.setTextColor(R.color.color_red);
