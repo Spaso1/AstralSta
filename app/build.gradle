@@ -11,11 +11,16 @@ android {
         minSdk 30
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "20240920.1905"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    // 自定义打包名称
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "AstralSta_${buildType.name}_v${versionName}.apk"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
