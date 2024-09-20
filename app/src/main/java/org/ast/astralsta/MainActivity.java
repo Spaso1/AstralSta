@@ -155,7 +155,11 @@ public class MainActivity extends AppCompatActivity {
                                 a2 = a2 * -1;
                             }
                         }
-                        String time = mYear[0] + "-" + b + "-" + mDay[0] + " 10:10:10";
+                        String d = String.valueOf(mDay[0]);
+                        if(mDay[0] < 10) {
+                            d = "0" + mDay[0];
+                        }
+                        String time = mYear[0] + "-" + b + "-" + d + " 10:10:10";
                         Item item = new Item(0, time, "未知", good, a2,String.valueOf(generateRandomIntUsingMath(1000000,200000000)) , "余额", enu);
                         Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
                         databaseHelper.addItem(item);
@@ -179,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
 
         Button buttonSelectMonthYear = findViewById(R.id.button_select_month_year);
 
@@ -298,16 +301,21 @@ public class MainActivity extends AppCompatActivity {
                 // 因为我们只关心月份，这里可以忽略year和day
                 year[0] = selectedYear;
                 month[0] = selectedMonth + 1;
+
                 day[0] = selectedDay;
+                String dd = String.valueOf(day[0]);
+                if(day[0] < 10) {
+                    dd = 0 + String.valueOf(day[0]);
+                }
                 Cursor cursor = null;
                 items.clear();
                 itemPos.clear();
                 itemsSSS.clear();
                 adapter.notifyDataSetChanged();
                 if (month[0] < 10) {
-                    cursor = databaseHelper.queryByDay(String.valueOf(year[0]) + "-0" + month[0] + "-" + day[0]);
+                    cursor = databaseHelper.queryByDay(String.valueOf(year[0]) + "-0" + month[0] + "-" + dd);
                 }else {
-                    cursor = databaseHelper.queryByDay(String.valueOf(year[0]) + "-" + month[0] + "-" + day[0]);
+                    cursor = databaseHelper.queryByDay(String.valueOf(year[0]) + "-" + month[0] + "-" + dd);
                 }
                 double sum = 0.0;
                 double add = 0.0;
@@ -338,9 +346,9 @@ public class MainActivity extends AppCompatActivity {
                 TextView textView2= findViewById(R.id.textView2);
                 textView2.setText("收入 " + add + "\n支出 " + scr);
                 if (month[0] < 10) {
-                    pagenow = String.valueOf("day-" + year[0]) + "-0" + month[0] + "-" + day[0];
+                    pagenow = String.valueOf("day-" + year[0]) + "-0" + month[0] + "-" + dd;
                 }else {
-                    pagenow = String.valueOf("day-" + year[0]) + "-" + month[0] + "-" + day[0];
+                    pagenow = String.valueOf("day-" + year[0]) + "-" + month[0] + "-" + dd;
                 }
                 toggleVisibility();
             }
