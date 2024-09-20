@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
                         databaseHelper.addItem(item);
                         Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     }catch (Exception e) {
                         Toast.makeText(MainActivity.this, "请输入正确的数据", Toast.LENGTH_SHORT).show();
@@ -148,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
 
                 btn5.setOnClickListener(v3 -> {
                     Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 });
             }
@@ -243,6 +245,7 @@ public class MainActivity extends AppCompatActivity {
         Button buttonhome = findViewById(R.id.button2);
         buttonhome.setOnClickListener(v -> {
             Intent intent2 = new Intent(MainActivity.this, MainActivity.class);
+            intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent2);
             pagenow = "";
         });
@@ -367,9 +370,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void pickFile() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*"); // 允许选择任何类型的文件
-        startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
+        try {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*"); // 允许选择任何类型的文件
+            startActivityForResult(intent, REQUEST_CODE_PICK_FILE);
+        }catch (Exception e) {
+            Log.d("文件格式错误", e.toString());
+        }
     }
 
     @Override
@@ -431,7 +438,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 fileContent = content.toString();
                 Log.d("File Content", fileContent);
-                fileContent = fileContent.split(",交易订单号,商家订单号,备注,")[1];
+                try {
+                    fileContent = fileContent.split(",交易订单号,商家订单号,备注,")[1];
+                }catch (Exception e) {
+                    Toast.makeText(this, "文件格式错误", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 String data[] = fileContent.split("\n");
                 int i = 0;
                 int i2 = 0;
@@ -464,7 +476,10 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (IOException e) {
             e.printStackTrace();
-
+            Toast.makeText(this, "读取文件失败,文件格式错误", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
     }
         private String readFile() {
