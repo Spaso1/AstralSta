@@ -185,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         Button buttonSelectMonthYear = findViewById(R.id.button_select_month_year);
-
         buttonSelectMonthYear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
