@@ -10,6 +10,8 @@ import android.icu.util.Calendar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.*;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +31,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.*;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
@@ -39,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MainActivity extends AppCompatActivity {
-
+    public static String pagenow = "";
     private static final int REQUEST_CODE_PICK_FILE = 1;
     private DrawerLayout drawerLayout;
     private ListView navigationDrawer;
@@ -48,21 +51,43 @@ public class MainActivity extends AppCompatActivity {
     public static DatabaseHelper databaseHelper;
     public static Context context;
     private MyAdapter adapter;
+    private Button toggleButton;
+    private Button button1, button2, button3;
     public static Vector<String> items = new Vector<>();
     public static Vector<Integer> itemsSSS = new Vector<>();
     public static ConcurrentHashMap<String,Item> itemMap = new ConcurrentHashMap<>();
     private Vector<Item> events = new Vector<>();
-    @SuppressLint("MissingInflatedId")
     @Override
+    @SuppressLint({"MissingInflatedId", "Range"})
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.activity_main);
         context = this;
         databaseHelper = new DatabaseHelper(this);
-        // 初始化侧边菜单
-        Button btn = findViewById(R.id.button);
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("page")) {
+            pagenow = intent.getStringExtra("page");
+        }
+
+        toggleButton = findViewById(R.id.button_toggle);
+        button1 = findViewById(R.id.button_1);
+        button2 = findViewById(R.id.button);
+        Button btn = button2;
+        button3 = findViewById(R.id.button_select_month_year);
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showMonthPicker2();
+            }
+        });
+        toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleVisibility();
+            }
+        });
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -147,10 +172,144 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new SpaceItemDecoration(spaceInPixels));
         readData();
-
+        if (pagenow.contains("day")) {
+            Cursor cursor = null;
+            items.clear();
+            itemsSSS.clear();
+            adapter.notifyDataSetChanged();
+            cursor = databaseHelper.queryByDay(pagenow.replace("day-",""));
+            double sum = 0.0;
+            double add = 0.0;
+            double scr = 0.0;
+            while (cursor.moveToNext()) {
+                 String id = cursor.getString(cursor.getColumnIndex("id"));
+                String time = cursor.getString(cursor.getColumnIndex("time"));
+                String to = cursor.getString(cursor.getColumnIndex("tto"));
+                String good = cursor.getString(cursor.getColumnIndex("good"));
+                double in_out = cursor.getDouble(cursor.getColumnIndex("in_out"));
+                String code = cursor.getString(cursor.getColumnIndex("code"));
+                String enumValue = cursor.getString(cursor.getColumnIndex("enum"));
+                String good_enum = cursor.getString(cursor.getColumnIndex("good_enum"));
+                Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
+                items.add(item.getTime());
+                itemsSSS.add(item.getId());
+                adapter.notifyDataSetChanged();
+                sum += item.getIn_out();
+                if(item.getIn_out() > 0) {
+                    add += item.getIn_out();
+                }else {
+                    scr -= item.getIn_out();
+                }
+            }
+            TextView textView = findViewById(R.id.textView6);
+            textView.setText("当日收支 " + sum + "\n当日记录 " + items.size());
+            TextView textView2= findViewById(R.id.textView2);
+            textView2.setText("收入 " + add + "\n支出 " + scr);
+        }else if(pagenow.contains("month")) {
+            Cursor cursor = null;
+            items.clear();
+            itemsSSS.clear();
+            adapter.notifyDataSetChanged();
+            cursor = databaseHelper.queryByCMouth(pagenow.replace("month-",""));
+            double sum = 0.0;
+            double add = 0.0;
+            double scr = 0.0;
+            while (cursor.moveToNext()) {
+                String id = cursor.getString(cursor.getColumnIndex("id"));
+                String time = cursor.getString(cursor.getColumnIndex("time"));
+                String to = cursor.getString(cursor.getColumnIndex("tto"));
+                String good = cursor.getString(cursor.getColumnIndex("good"));
+                double in_out = cursor.getDouble(cursor.getColumnIndex("in_out"));
+                String code = cursor.getString(cursor.getColumnIndex("code"));
+                String enumValue = cursor.getString(cursor.getColumnIndex("enum"));
+                String good_enum = cursor.getString(cursor.getColumnIndex("good_enum"));
+                Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
+                items.add(item.getTime());
+                itemsSSS.add(item.getId());
+                adapter.notifyDataSetChanged();
+                sum += item.getIn_out();
+                if(item.getIn_out() > 0) {
+                    add += item.getIn_out();
+                }else {
+                    scr -= item.getIn_out();
+                }
+            }
+            TextView textView = findViewById(R.id.textView6);
+            textView.setText("当月收支 " + sum + "\n当月记录 " + items.size());
+            TextView textView2= findViewById(R.id.textView2);
+            textView2.setText("收入 " + add + "\n支出 " + scr);
+        }
+        //返回默认界面
+        Button buttonhome = findViewById(R.id.button2);
+        buttonhome.setOnClickListener(v -> {
+            Intent intent2 = new Intent(MainActivity.this, MainActivity.class);
+            startActivity(intent2);
+            pagenow = "";
+        });
     }
     public static int generateRandomIntUsingMath(int min, int max) {
         return (int)(Math.random() * (max - min + 1)) + min;
+    }
+    private void showMonthPicker2() {
+        final Calendar calendar = Calendar.getInstance();
+        final int[] year = {calendar.get(Calendar.YEAR)};
+        final int[] month = {calendar.get(Calendar.MONTH)};
+        final int[] day = {calendar.get(Calendar.DAY_OF_MONTH)};
+
+        // 创建DatePickerDialog实例
+        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            @SuppressLint({"NotifyDataSetChanged", "Range"})
+            public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
+                // 因为我们只关心月份，这里可以忽略year和day
+                year[0] = selectedYear;
+                month[0] = selectedMonth + 1;
+                day[0] = selectedDay;
+                Cursor cursor = null;
+                items.clear();
+                itemsSSS.clear();
+                adapter.notifyDataSetChanged();
+                if (month[0] < 10) {
+                    cursor = databaseHelper.queryByDay(String.valueOf(year[0]) + "-0" + month[0] + "-" + day[0]);
+                }else {
+                    cursor = databaseHelper.queryByDay(String.valueOf(year[0]) + "-" + month[0] + "-" + day[0]);
+                }
+                double sum = 0.0;
+                double add = 0.0;
+                double scr = 0.0;
+                while (cursor.moveToNext()) {
+                    String id = cursor.getString(cursor.getColumnIndex("id"));
+                    String time = cursor.getString(cursor.getColumnIndex("time"));
+                    String to = cursor.getString(cursor.getColumnIndex("tto"));
+                    String good = cursor.getString(cursor.getColumnIndex("good"));
+                    double in_out = cursor.getDouble(cursor.getColumnIndex("in_out"));
+                    String code = cursor.getString(cursor.getColumnIndex("code"));
+                    String enumValue = cursor.getString(cursor.getColumnIndex("enum"));
+                    String good_enum = cursor.getString(cursor.getColumnIndex("good_enum"));
+                    Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
+                    items.add(item.getTime());
+                    itemsSSS.add(item.getId());
+                    adapter.notifyDataSetChanged();
+                    sum += item.getIn_out();
+                    if(item.getIn_out() > 0) {
+                        add += item.getIn_out();
+                    }else {
+                        scr -= item.getIn_out();
+                    }
+                }
+                TextView textView = findViewById(R.id.textView6);
+                textView.setText("当日收支 " + sum + "\n当日记录 " + items.size());
+                TextView textView2= findViewById(R.id.textView2);
+                textView2.setText("收入 " + add + "\n支出 " + scr);
+                if (month[0] < 10) {
+                    pagenow = String.valueOf("day-" + year[0]) + "-0" + month[0] + "-" + day[0];
+                }else {
+                    pagenow = String.valueOf("day-" + year[0]) + "-" + month[0] + "-" + day[0];
+                }
+                toggleVisibility();
+            }
+        }, year[0], month[0], day[0]).show();
+
     }
     private void showMonthPicker() {
         final Calendar calendar = Calendar.getInstance();
@@ -160,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 创建DatePickerDialog实例
         new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @SuppressLint("NotifyDataSetChanged")
+            @SuppressLint({"NotifyDataSetChanged", "Range"})
             @Override
             public void onDateSet(DatePicker view, int selectedYear, int selectedMonth, int selectedDay) {
                 // 因为我们只关心月份，这里可以忽略year和day
@@ -168,30 +327,41 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "您选择了月份：" + selectedMonthStr, Toast.LENGTH_SHORT).show();
                 Button btn = findViewById(R.id.button_select_month_year);
                 btn.setText(selectedMonthStr);
+                Cursor cursor = null;
                 items.clear();
                 itemsSSS.clear();
                 adapter.notifyDataSetChanged();
-                double sum = databaseHelper.sumInOutByMonth( selectedYear +"-" + selectedMonthStr);
-                double add = 0;
-                double scr = 0;
-                String temp = "";
-                for (Item item : events) {
-                    if (item.getTime().contains("-" + selectedMonthStr + "-")) {
-                        items.add(item.getTime());
-                        itemsSSS.add(item.getId());
-                        adapter.notifyDataSetChanged();
-                        adapter.notifyItemInserted(items.size() - 1);
-                        if(item.getIn_out() < 0) {
-                            add += item.getIn_out();
-                        }else {
-                            scr += item.getIn_out();
-                        }
+                cursor = databaseHelper.queryByCMouth(pagenow.replace("month-",""));
+                double sum = 0.0;
+                double add = 0.0;
+                double scr = 0.0;
+                while (cursor.moveToNext()) {
+                    String id = cursor.getString(cursor.getColumnIndex("id"));
+                    String time = cursor.getString(cursor.getColumnIndex("time"));
+                    String to = cursor.getString(cursor.getColumnIndex("tto"));
+                    String good = cursor.getString(cursor.getColumnIndex("good"));
+                    double in_out = cursor.getDouble(cursor.getColumnIndex("in_out"));
+                    String code = cursor.getString(cursor.getColumnIndex("code"));
+                    String enumValue = cursor.getString(cursor.getColumnIndex("enum"));
+                    String good_enum = cursor.getString(cursor.getColumnIndex("good_enum"));
+                    Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
+                    items.add(item.getTime());
+                    itemsSSS.add(item.getId());
+                    adapter.notifyDataSetChanged();
+                    sum += item.getIn_out();
+                    if(item.getIn_out() > 0) {
+                        add += item.getIn_out();
+                    }else {
+                        scr -= item.getIn_out();
                     }
                 }
+                sum = roundToTwoDecimals(sum);
                 TextView textView = findViewById(R.id.textView6);
-                textView.setText("本月收支 " + sum + "\n本月记录 " + items.size());
+                textView.setText("当月收支 " + sum + "\n当月记录 " + items.size());
                 TextView textView2= findViewById(R.id.textView2);
-                textView2.setText("收入 " + scr + "\n支出 " + add);
+                textView2.setText("收入 " + add + "\n支出 " + scr);
+                pagenow = "month-" + selectedYear + "-" + selectedMonthStr;
+                toggleVisibility();
             }
         }, year, month, day).show();
     }
@@ -373,7 +543,7 @@ public class MainActivity extends AppCompatActivity {
             } while (cursor.moveToNext());
         }
         TextView textView = findViewById(R.id.textView6);
-        textView.setText("总收支 "+ String.valueOf(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)) + "\n总共 " + a + " 条记录");
+        textView.setText("总收支 "+ roundToTwoDecimals(databaseHelper.sumColumn(DatabaseHelper.COLUMN_IN_OUT)) + "\n总共 " + a + " 条记录");
         TextView textView7 = findViewById(R.id.textView2);
         textView7.setText("支出 " + String.valueOf(sca).replace("-","") + "\n收入 " + String.valueOf(add));
         cursor.close();
@@ -389,5 +559,33 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
+    private void toggleVisibility() {
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+        Animation slideDown = AnimationUtils.loadAnimation(this, R.anim.slide_down);
 
+        if (button1.getVisibility() == View.GONE) {
+            button1.startAnimation(fadeIn);
+            button1.setVisibility(View.VISIBLE);
+
+            button2.startAnimation(fadeIn);
+            button2.setVisibility(View.VISIBLE);
+
+            button3.startAnimation(fadeIn);
+            button3.setVisibility(View.VISIBLE);
+        } else {
+            button1.startAnimation(slideDown);
+            button1.setVisibility(View.GONE);
+
+            button2.startAnimation(slideDown);
+            button2.setVisibility(View.GONE);
+
+            button3.startAnimation(slideDown);
+            button3.setVisibility(View.GONE);
+        }
+    }
+    public static double roundToTwoDecimals(double value) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+        String formattedValue = decimalFormat.format(value);
+        return Double.parseDouble(formattedValue);
+    }
 }

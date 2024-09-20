@@ -125,6 +125,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return totalInOut;
     }
+    public Cursor queryByDay(String day) {
+        // 定义查询条件
+        String selection = COLUMN_TIME + " LIKE ?";
+        String[] selectionArgs = {day + "%"};
+// 执行查询
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_NAME,
+                null, // projection (null means all columns)
+                selection,
+                selectionArgs,
+                null, // groupBy
+                null, // having
+                null  // orderBy
+        );
+        return cursor;
+    }
+    public Cursor queryByCMouth(String mouth) {
+        // 定义查询条件
+        String selection = COLUMN_TIME + " LIKE ?";
+        String[] selectionArgs = {mouth + "%"};
+// 执行查询
+        Cursor cursor = getReadableDatabase().query(
+                TABLE_NAME,
+                null, // projection (null means all columns)
+                selection,
+                selectionArgs,
+                null, // groupBy
+                null, // having
+                null  // orderBy
+        );
+        return cursor;
+    }
     public Cursor que() {
         SQLiteDatabase db = getReadableDatabase();
 

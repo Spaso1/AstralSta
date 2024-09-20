@@ -43,7 +43,11 @@ public class SecondActivity extends AppCompatActivity {
         textView3.setText(item.getGood_enum());
         Button button = findViewById(R.id.back);
         button.setOnClickListener(v -> {
-            Intent intent = new Intent(SecondActivity.this, MainActivity.class);
+            Intent intent = getIntent();
+            String data = intent.getStringExtra("page");
+            intent = new Intent(SecondActivity.this, MainActivity.class);
+
+            intent.putExtra("page",data);
             startActivity(intent);
         });
         Button button2 = findViewById(R.id.change);

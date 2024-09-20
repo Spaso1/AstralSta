@@ -123,6 +123,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         int itemId = itemsSSS.get(position);
                         // 跳转到新的Activity
                         Intent intent = new Intent(context, SecondActivity.class);
+                        intent.putExtra("page", MainActivity.pagenow);
                         intent.putExtra("itemData", itemData);
                         intent.putExtra("itemId", itemId);
                         context.startActivity(intent);
