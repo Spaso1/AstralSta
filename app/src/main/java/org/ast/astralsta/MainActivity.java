@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private Button button1, button2, button3;
     public static Vector<String> items = new Vector<>();
     public static Vector<Integer> itemsSSS = new Vector<>();
+    public static Map<Integer,Integer> itemPos = new TreeMap<>();
     public static ConcurrentHashMap<String,Item> itemMap = new ConcurrentHashMap<>();
     private Vector<Item> events = new Vector<>();
     @Override
@@ -118,14 +119,29 @@ public class MainActivity extends AppCompatActivity {
                         datePickerDialog.show();
                     }
                 });
+                Switch switch1 = findViewById(R.id.switch1);
+                TextView textView7 = findViewById(R.id.textView7);
+                switch1.setChecked(true);
+                switch1.setOnClickListener(v5 -> {
+                    if (switch1.isChecked()) {
+                        switch1.setText("支出");
+                        textView7.setText("商品");
+                    } else {
+                        switch1.setText("收入");
+                        textView7.setText("来源");
+                    }
+                });
                 button3.setOnClickListener(v4 -> {
                     try {
+
                         EditText godd = findViewById(R.id.editView7);
                         String good = godd.getText().toString();
                         EditText su = findViewById(R.id.editView8);
                         String jiage = su.getText().toString();
                         EditText en = findViewById(R.id.editView9);
                         String enu = en.getText().toString();
+
+
                         int a = (mMonth[0] + 1);
                         String b = "";
                         if(a < 10) {
@@ -133,8 +149,14 @@ public class MainActivity extends AppCompatActivity {
                         }else {
                             b = String.valueOf(a);
                         }
+                        double a2 = Double.parseDouble(jiage);
+                        if (switch1.isChecked()) {
+                            if (a2 > 0) {
+                                a2 = a2 * -1;
+                            }
+                        }
                         String time = mYear[0] + "-" + b + "-" + mDay[0] + " 10:10:10";
-                        Item item = new Item(0, time, "未知", good, Double.parseDouble(jiage),String.valueOf(generateRandomIntUsingMath(1000000,200000000)) , enu, "默认");
+                        Item item = new Item(0, time, "未知", good, a2,String.valueOf(generateRandomIntUsingMath(1000000,200000000)) , "余额", enu);
                         Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
                         databaseHelper.addItem(item);
                         Intent intent = new Intent(MainActivity.this, MainActivity.class);
@@ -178,6 +200,7 @@ public class MainActivity extends AppCompatActivity {
             Cursor cursor = null;
             items.clear();
             itemsSSS.clear();
+            itemPos.clear();
             adapter.notifyDataSetChanged();
             cursor = databaseHelper.queryByDay(pagenow.replace("day-",""));
             double sum = 0.0;
@@ -195,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
                 Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
                 items.add(item.getTime());
                 itemsSSS.add(item.getId());
+                itemPos.put(item.getId(), items.size());
                 adapter.notifyDataSetChanged();
                 sum += item.getIn_out();
                 if(item.getIn_out() > 0) {
@@ -207,10 +231,12 @@ public class MainActivity extends AppCompatActivity {
             textView.setText("当日收支 " + sum + "\n当日记录 " + items.size());
             TextView textView2= findViewById(R.id.textView2);
             textView2.setText("收入 " + add + "\n支出 " + scr);
-        }else if(pagenow.contains("month")) {
+        }
+        else if(pagenow.contains("month")) {
             Cursor cursor = null;
             items.clear();
             itemsSSS.clear();
+            itemPos.clear();
             adapter.notifyDataSetChanged();
             cursor = databaseHelper.queryByCMouth(pagenow.replace("month-",""));
             double sum = 0.0;
@@ -228,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
                 Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
                 items.add(item.getTime());
                 itemsSSS.add(item.getId());
+                itemPos.put(item.getId(), items.size());
                 adapter.notifyDataSetChanged();
                 sum += item.getIn_out();
                 if(item.getIn_out() > 0) {
@@ -249,6 +276,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent2);
             pagenow = "";
         });
+        if (intent != null && intent.hasExtra("po")) {
+            int position = intent.getIntExtra("po", 0);
+            recyclerView.smoothScrollToPosition(position + 4);
+        }
     }
     public static int generateRandomIntUsingMath(int min, int max) {
         return (int)(Math.random() * (max - min + 1)) + min;
@@ -270,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
                 day[0] = selectedDay;
                 Cursor cursor = null;
                 items.clear();
+                itemPos.clear();
                 itemsSSS.clear();
                 adapter.notifyDataSetChanged();
                 if (month[0] < 10) {
@@ -292,6 +324,7 @@ public class MainActivity extends AppCompatActivity {
                     Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
                     items.add(item.getTime());
                     itemsSSS.add(item.getId());
+                    itemPos.put(item.getId(), items.size());
                     adapter.notifyDataSetChanged();
                     sum += item.getIn_out();
                     if(item.getIn_out() > 0) {
@@ -332,6 +365,7 @@ public class MainActivity extends AppCompatActivity {
                 btn.setText(selectedMonthStr);
                 Cursor cursor = null;
                 items.clear();
+                itemPos.clear();
                 itemsSSS.clear();
                 adapter.notifyDataSetChanged();
                 cursor = databaseHelper.queryByCMouth(pagenow.replace("month-",""));
@@ -350,6 +384,7 @@ public class MainActivity extends AppCompatActivity {
                     Item item = new Item(Integer.parseInt(id), time, to, good, in_out, code, enumValue, good_enum);
                     items.add(item.getTime());
                     itemsSSS.add(item.getId());
+                    itemPos.put(item.getId(), items.size());
                     adapter.notifyDataSetChanged();
                     sum += item.getIn_out();
                     if(item.getIn_out() > 0) {
@@ -515,6 +550,7 @@ public class MainActivity extends AppCompatActivity {
     public void readData() {
         items.clear();
         itemsSSS.clear();
+        itemPos.clear();
         events.clear();
         adapter.notifyDataSetChanged();
         // 获取可读的数据库实例
@@ -550,6 +586,7 @@ public class MainActivity extends AppCompatActivity {
 
                 items.add(item.getTime());
                 itemsSSS.add(item.getId());
+                itemPos.put(item.getId(), items.size());
                 adapter.notifyDataSetChanged();
                 events.add(item);
                 itemMap.put(item.getTime(), item);

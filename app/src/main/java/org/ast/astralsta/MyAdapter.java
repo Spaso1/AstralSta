@@ -126,6 +126,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
                         intent.putExtra("page", MainActivity.pagenow);
                         intent.putExtra("itemData", itemData);
                         intent.putExtra("itemId", itemId);
+                        Log.d("TAG", "onClick: " + itemPos.get(itemId));
+                        intent.putExtra("po", itemPos.get(itemId));
                         context.startActivity(intent);
                     }
                 }

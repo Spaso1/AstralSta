@@ -19,6 +19,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" android:id="@+id/tableRow2">
 
+        <Switch
+                android:text="支出"
+                android:layout_marginTop="10mm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/switch2"/>
     </TableRow>
     <TextView
             android:text="商品"
@@ -31,6 +36,7 @@
             android:id="@+id/textView"
             android:layout_marginTop="23mm"
             android:layout_width="394dp"
+            android:layout_marginLeft="5mm"
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"/>
@@ -43,6 +49,7 @@
             android:layout_height="wrap_content" android:id="@+id/textView4"/>
     <EditText
             android:id="@+id/textView5"
+            android:layout_marginLeft="5mm"
             android:layout_marginTop="40mm"
             android:layout_width="394dp"
             android:inputType="number"
@@ -59,6 +66,7 @@
     <EditText
             android:id="@+id/editView7"
             android:layout_marginTop="55mm"
+            android:layout_marginLeft="5mm"
             android:layout_width="394dp"
             android:layout_height="wrap_content"
             android:textSize="18sp"

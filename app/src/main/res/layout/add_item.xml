@@ -32,6 +32,11 @@
             android:layout_height="match_parent" android:id="@+id/tableRow">
 
 
+        <Switch
+                android:layout_marginTop="15mm"
+                android:text="支出"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/switch1"/>
     </TableRow>
     <TextView
             android:text="商品"
@@ -62,6 +67,8 @@
             android:layout_marginLeft="10mm"
             android:layout_width="306dp"
             android:layout_height="wrap_content"
+            android:inputType="number"
+
             android:id="@+id/editView8"/>
     <TextView
             android:text="种类"
