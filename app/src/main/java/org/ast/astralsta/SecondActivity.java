@@ -1,6 +1,8 @@
 package org.ast.astralsta;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,8 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Objects;
 
-import static org.ast.astralsta.MainActivity.context;
-import static org.ast.astralsta.MainActivity.itemPos;
+import static org.ast.astralsta.MainActivity.*;
 
 @SuppressLint({"MissingInflatedId", "LocalSuppress", "Range"})
 public class SecondActivity extends AppCompatActivity {
@@ -95,6 +96,32 @@ public class SecondActivity extends AppCompatActivity {
             dbHelper.updateTransaction(item);
             Toast.makeText(context, "修改成功", Toast.LENGTH_SHORT).show();
         });
+        Button button4 = findViewById(R.id.delete);
+        button4.setOnClickListener(v3 -> {
+            // Java 示例代码
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("删除确认")
+                    .setMessage("是否删除此记录?")
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dbHelper.deleteDataById(item.getId());
+                            Toast.makeText(context, "删除成功", Toast.LENGTH_SHORT).show();
+                            Intent intent = getIntent();
+                            intent = new Intent(SecondActivity.this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // 用户点击了取消按钮后的操作
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
 
+
+        });
     }
 }

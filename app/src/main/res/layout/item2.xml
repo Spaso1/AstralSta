@@ -84,6 +84,6 @@
     <Button
             android:text="删除"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/button4" app:layout_anchorGravity="end|bottom"
+            android:layout_height="wrap_content" android:id="@+id/delete" app:layout_anchorGravity="end|bottom"
             app:layout_anchor="@+id/tableRow2"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
