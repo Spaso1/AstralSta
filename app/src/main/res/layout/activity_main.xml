@@ -89,6 +89,22 @@
             android:visibility="gone"
             app:layout_anchor="@+id/drawer_layout" android:id="@+id/button_select_month_year"/>
     <Button
+            android:text="支付类型"
+            app:layout_anchorGravity="right|bottom"
+            android:layout_marginBottom="45mm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_anchor="@+id/drawer_layout" android:id="@+id/buu"/>
+    <Button
+            android:text="更多功能"
+            app:layout_anchorGravity="right|bottom"
+            android:layout_marginBottom="55mm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_anchor="@+id/drawer_layout" android:id="@+id/itemBox"/>
+    <Button
             android:text="HOME"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" app:layout_anchorGravity="bottom|center"

@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/LinearLayout1"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+    <!--
+        第一线性布局
+        LinearLayout一定要设置方向
+        android:orientation 值:horizontal 元素水平摆放  |  vertical 元素垂直摆放
+        android:gravity="right"设置对齐方式
+     -->
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#5B5E60"
+            android:orientation="horizontal">
+        <TextView android:layout_width="match_parent" android:layout_height="10mm"
+                  android:text="AstralSta"
+                  android:textColor="#FDFBFC"
+                  android:textSize="30dp"
+                  android:paddingLeft="10mm"/>
+
+    </LinearLayout>
+
+    <!-- 第二线性布局 -->
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="666dp"
+                android:layout_weight="1"
+                android:background="#5B5E60"
+                android:text="红色"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:background="#000000"
+                android:text="绿色"/>
+
+    </LinearLayout>
+</LinearLayout>

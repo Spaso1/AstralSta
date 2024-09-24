@@ -1,8 +1,10 @@
 package org.ast.astralsta;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -13,7 +15,6 @@ import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.*;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -46,13 +47,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PICK_FILE = 1;
     private DrawerLayout drawerLayout;
     private ListView navigationDrawer;
-
     private RecyclerView recyclerView;
     public static DatabaseHelper databaseHelper;
     public static Context context;
-    private MyAdapter adapter;
+    private static MyAdapter adapter;
     private Button toggleButton;
-    private Button button1, button2, button3;
+    private Button button1, button2, button3,button4,button5;
+    private RecyclerViewScrollListener scrollListener;
     public static Vector<String> items = new Vector<>();
     public static Vector<Integer> itemsSSS = new Vector<>();
     public static Map<Integer,Integer> itemPos = new TreeMap<>();
@@ -62,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint({"MissingInflatedId", "Range"})
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
         setContentView(R.layout.activity_main);
         context = this;
@@ -71,17 +71,55 @@ public class MainActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("page")) {
             pagenow = intent.getStringExtra("page");
         }
-
         toggleButton = findViewById(R.id.button_toggle);
         button1 = findViewById(R.id.button_1);
         button2 = findViewById(R.id.button);
         Button btn = button2;
         button3 = findViewById(R.id.button_select_month_year);
+        button4 = findViewById(R.id.buu);
+        button5 = findViewById(R.id.itemBox);
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showMonthPicker2();
             }
+        });
+        button5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ItemWorkerActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+        button4.setOnClickListener(v -> {
+             android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+            builder.setTitle("更多")
+                    .setMessage("分类查询")
+                    .setPositiveButton("收入", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            readInData();
+                            SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("page", "indata");
+                            editor.apply(); // 或者使用commit()方法
+
+                            toggleVisibility();
+                        }
+                    })
+                    .setNegativeButton("支出", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // 用户点击了取消按钮后的操作
+                            readOutData();
+                            SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("page", "outdata");
+                            editor.apply(); // 或者使用commit()方法
+                            toggleVisibility();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
         });
         toggleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,7 +235,33 @@ public class MainActivity extends AppCompatActivity {
         int spaceInPixels = 16; // 例如，16dp
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new SpaceItemDecoration(spaceInPixels));
-        readData();
+        // 初始化滑动监听器
+        scrollListener = new RecyclerViewScrollListener();
+        recyclerView.addOnScrollListener(scrollListener);
+
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        String temp = prefs.getString("page", "default_value");
+
+        if(temp.equals("indata")) {
+            readInData();
+            pagenow = "indata";
+        }else if(temp.equals("outdata")) {
+            readOutData();
+            pagenow = "outdata";
+        }else if(temp.equals("all")) {
+            readData();
+            pagenow = "all";
+        }else if(temp.equals("day")) {
+            readData();
+            pagenow = "day";
+        }else if(temp.equals("mouth")) {
+            readData();
+            pagenow = "mouth";
+        }else {
+            readData();
+        }
+
+
         if (pagenow.contains("day")) {
             Cursor cursor = null;
             items.clear();
@@ -276,12 +340,21 @@ public class MainActivity extends AppCompatActivity {
             Intent intent2 = new Intent(MainActivity.this, MainActivity.class);
             intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent2);
+            SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+            // 在应用退出时清除所有数据
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear(); // 清除所有数据
+            editor.apply(); // 提交更改
             pagenow = "";
         });
         if (intent != null && intent.hasExtra("po")) {
             int position = intent.getIntExtra("po", 0);
             recyclerView.smoothScrollToPosition(position + 4);
         }
+    }
+    @SuppressLint("NotifyDataSetChanged")
+    public static void update() {
+        adapter.notifyDataSetChanged();
     }
     public static int generateRandomIntUsingMath(int min, int max) {
         return (int)(Math.random() * (max - min + 1)) + min;
@@ -631,6 +704,12 @@ public class MainActivity extends AppCompatActivity {
 
             button3.startAnimation(fadeIn);
             button3.setVisibility(View.VISIBLE);
+
+            button4.startAnimation(fadeIn);
+            button4.setVisibility(View.VISIBLE);
+
+            button5.startAnimation(fadeIn);
+            button5.setVisibility(View.VISIBLE);
         } else {
             button1.startAnimation(slideDown);
             button1.setVisibility(View.GONE);
@@ -640,6 +719,12 @@ public class MainActivity extends AppCompatActivity {
 
             button3.startAnimation(slideDown);
             button3.setVisibility(View.GONE);
+
+            button4.startAnimation(slideDown);
+            button4.setVisibility(View.GONE);
+
+            button5.startAnimation(slideDown);
+            button5.setVisibility(View.GONE);
         }
     }
     public static double roundToTwoDecimals(double value) {
@@ -647,4 +732,109 @@ public class MainActivity extends AppCompatActivity {
         String formattedValue = decimalFormat.format(value);
         return Double.parseDouble(formattedValue);
     }
+
+    @SuppressLint({"Range", "SetTextI18n", "NotifyDataSetChanged"})
+    public void readInData() {
+        items.clear();
+        itemsSSS.clear();
+        itemPos.clear();
+        events.clear();
+        adapter.notifyDataSetChanged();
+        // 获取可读的数据库实例
+        Cursor cursor = databaseHelper.que();
+        double a = 0;
+        double add = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
+                String time = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TIME));
+                String to = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TO));
+                String good = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOOD));
+                good = good.replace("\"","");
+                double inOut = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_IN_OUT));
+                String code = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_CODE));
+                String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
+                String goodenum = "未知";
+                try {
+                    goodenum = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOODENUM));
+                }catch (Exception e) {
+                    Item item = new Item(0, time, to, good, inOut, code, enumValue,"未知");
+                    databaseHelper.updateTransaction(item);
+                }
+                if(inOut >= 0) {
+                    add += inOut;
+                    Item item = new Item(id, time, to, good, inOut, code, enumValue, goodenum);
+                    items.add(item.getTime());
+                    itemsSSS.add(item.getId());
+                    itemPos.put(item.getId(), items.size());
+                    adapter.notifyDataSetChanged();
+                    events.add(item);
+                    itemMap.put(item.getTime(), item);
+                    a++;
+                }
+
+
+                // 处理每一行数据
+            } while (cursor.moveToNext());
+        }
+        TextView textView = findViewById(R.id.textView6);
+        textView.setText("总收入 "+ add + "\n总共 " + a + " 条记录");
+        TextView textView7 = findViewById(R.id.textView2);
+        textView7.setText("收入 " + String.valueOf(add));
+        cursor.close();
+
+    }
+    @SuppressLint({"Range", "SetTextI18n", "NotifyDataSetChanged"})
+    public void readOutData() {
+        items.clear();
+        itemsSSS.clear();
+        itemPos.clear();
+        events.clear();
+        adapter.notifyDataSetChanged();
+        // 获取可读的数据库实例
+        Cursor cursor = databaseHelper.que();
+        double a = 0;
+        double add = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
+                String time = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TIME));
+                String to = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_TO));
+                String good = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOOD));
+                good = good.replace("\"","");
+                double inOut = cursor.getInt(cursor.getColumnIndex(DatabaseHelper.COLUMN_IN_OUT));
+                String code = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_CODE));
+                String enumValue = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_ENUM));
+                String goodenum = "未知";
+                try {
+                    goodenum = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_GOODENUM));
+                }catch (Exception e) {
+                    Item item = new Item(0, time, to, good, inOut, code, enumValue,"未知");
+                    databaseHelper.updateTransaction(item);
+                }
+                if(inOut < 0) {
+                    add += inOut;
+                    Item item = new Item(id, time, to, good, inOut, code, enumValue, goodenum);
+                    items.add(item.getTime());
+                    itemsSSS.add(item.getId());
+                    itemPos.put(item.getId(), items.size());
+                    adapter.notifyDataSetChanged();
+                    events.add(item);
+                    itemMap.put(item.getTime(), item);
+                    a++;
+                }
+
+
+                // 处理每一行数据
+            } while (cursor.moveToNext());
+        }
+        TextView textView = findViewById(R.id.textView6);
+        textView.setText("总支出 "+ add + "\n总共 " + a + " 条记录");
+        TextView textView7 = findViewById(R.id.textView2);
+        textView7.setText("支出 " + String.valueOf(add));
+        cursor.close();
+
+    }
+
+
 }

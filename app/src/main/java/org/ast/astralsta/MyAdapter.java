@@ -44,10 +44,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         Item a =itemMap.get(data.get(position));
         String time = a.getTime().split(" ")[0];
         holder.textView.setText(a.toGeShiHua());
-        if(a.getIn_out() < 0) {
-            holder.textVie2.setTextColor(R.color.color_red);
+        if(a.getIn_out() > 0) {
+            holder.textVie2.setText(time + "~入~账~");
+        }else {
+            holder.textVie2.setText(time);
         }
-        holder.textVie2.setText(time);
     }
     public static String convertTimeFormat(String inputDate) {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -113,6 +114,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             super(itemView);
             textView = itemView.findViewById(R.id.textView);
             textVie2 = itemView.findViewById(R.id.textViewRRR);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
