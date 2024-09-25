@@ -9,7 +9,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="#424145"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
@@ -55,7 +55,7 @@
     <TextView
             android:text="AstralSta"
             android:textSize="30dp"
-            android:textColor="#8BC34A"
+            android:textColor="#FEFFFD"
             android:layout_width="140dp"
             android:layout_height="48dp" app:layout_anchorGravity="start|top" app:layout_anchor="@+id/toolbar"
             android:id="@+id/textView10"/>

@@ -477,8 +477,24 @@ public class MainActivity extends AppCompatActivity {
                 TextView textView = findViewById(R.id.textView6);
                 textView.setText("当月收支 " + sum + "\n当月记录 " + items.size());
                 TextView textView2= findViewById(R.id.textView2);
-                textView2.setText("收入 " + add + "\n支出 " + scr);
                 pagenow = "month-" + selectedYear + "-" + selectedMonthStr;
+
+                SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                String date;
+                if(month < 10) {
+                    date = year + "-0" + (month + 1);
+                }else {
+                    date = year + "-" + (month + 1);
+                }
+                String monthlyBudget = sharedPreferences.getString(date,"0");
+                double monthlyBudgetDouble = Double.parseDouble(monthlyBudget);
+                if(!(monthlyBudgetDouble > scr)) {
+                    textView2.setTextColor(Color.rgb(255,100,0));
+                }
+                textView2.setText("收入 " + add + "\n支出 " + scr + "\n当月预算:"+ monthlyBudgetDouble);
+
+
                 toggleVisibility();
             }
         }, year, month, day).show();
