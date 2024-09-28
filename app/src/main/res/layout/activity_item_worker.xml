@@ -65,7 +65,7 @@
                             android:layout_height="50dp"
                             android:gravity="center"
                             android:id="@+id/yusuan"
-                            android:text="预算"/>
+                            android:text="计划节省"/>
                     <!--  android:layout_gravity="center"  让整个容器居中  -->
 
                 </androidx.cardview.widget.CardView>
@@ -83,7 +83,8 @@
                             android:layout_width="115dp"
                             android:layout_height="50dp"
                             android:gravity="center"
-                            android:text="Hello World!"/>
+                            android:id="@+id/daochu"
+                            android:text="导出账单"/>
                     <!--  android:layout_gravity="center"  让整个容器居中  -->
 
             </androidx.cardview.widget.CardView>

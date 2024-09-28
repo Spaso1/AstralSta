@@ -32,6 +32,11 @@ public class ItemWorkerActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         });
+
+        TextView textView2 = findViewById(R.id.daochu);
+        textView2.setOnClickListener(v ->{
+            Toast.makeText(ItemWorkerActivity.this, "功能暂未开放", Toast.LENGTH_SHORT).show();
+        });
     }
 
 
@@ -81,7 +86,7 @@ public class ItemWorkerActivity extends AppCompatActivity {
         });
         // 创建 AlertDialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("选择月份并填写预算")
+        builder.setTitle("选择月份并填写预存钱")
                 .setView(datePickerLayout)
                 .setPositiveButton("也是关闭", new DialogInterface.OnClickListener() {
                     @Override

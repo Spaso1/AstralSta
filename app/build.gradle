@@ -11,7 +11,7 @@ android {
         minSdk 30
         targetSdk 33
         versionCode 1
-        versionName "20240925.2139"
+        versionName "20240928.2146"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -23,8 +23,14 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    // 设置定义混淆规则的文件
+                    "proguard-rules.pro"
+            )
+
         }
     }
     compileOptions {

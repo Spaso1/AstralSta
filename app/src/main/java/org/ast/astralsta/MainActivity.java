@@ -489,11 +489,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String monthlyBudget = sharedPreferences.getString(date,"0");
                 double monthlyBudgetDouble = Double.parseDouble(monthlyBudget);
-                if(!(monthlyBudgetDouble > scr)) {
+                if(!(monthlyBudgetDouble > (scr - add))) {
                     textView2.setTextColor(Color.rgb(255,100,0));
-                }
-                textView2.setText("收入 " + add + "\n支出 " + scr + "\n当月预算:"+ monthlyBudgetDouble);
+                }else {
+                    textView2.setTextColor(Color.rgb(100,255,10));
 
+                }
+                textView2.setText("收入 " + add + "\n支出 " + String.format("%.2f", scr) + "\n当月应存:"+ monthlyBudgetDouble);
 
                 toggleVisibility();
             }
